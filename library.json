@@ -1,0 +1,35 @@
+{
+    "name": "AliyunMqttArduino",
+    "version": "0.1.0",
+    "keywords": "aliyun, mqtt, pubsub, iot",
+    "description": "A simple Aliyun MQTT connection library for Arduino",
+    "license": "MIT",
+    "homepage": "https://github.com/legenddcr/aliyun-mqtt-arduino",
+    "repository": {
+        "type": "git",
+        "url": "https://code.aliyun.com/hacklab/aliyun-mqtt-arduino.git"
+    },
+    "authors": {
+        "name": "Chengrui Deng",
+        "email": "legenddcr@gmail.com"
+    },
+    "dependencies": [
+        {
+            "name": "Crypto",
+            "version": "^0.2.0"
+        },
+        {
+            "name": "PubSubClient",
+            "version": "^2.7"
+        }
+    ],
+    "exclude": [
+        "examples",
+        "README.md"
+    ],
+    "frameworks": "arduino",
+    "platforms": [
+        "atmelavr",
+        "espressif8266"
+    ]
+}
