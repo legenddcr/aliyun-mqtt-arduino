@@ -23,10 +23,6 @@
             "version": "^2.7"
         }
     ],
-    "exclude": [
-        "examples",
-        "README.md"
-    ],
     "frameworks": "arduino",
     "platforms": [
         "atmelavr",
