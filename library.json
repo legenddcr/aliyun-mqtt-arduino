@@ -1,13 +1,13 @@
 {
     "name": "AliyunMqttArduino",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "keywords": "aliyun, mqtt, pubsub, iot",
     "description": "A simple Aliyun MQTT connection library for Arduino",
     "license": "MIT",
     "homepage": "https://github.com/legenddcr/aliyun-mqtt-arduino",
     "repository": {
         "type": "git",
-        "url": "https://code.aliyun.com/hacklab/aliyun-mqtt-arduino.git"
+        "url": "https://github.com/legenddcr/aliyun-mqtt-arduino.git"
     },
     "authors": {
         "name": "Chengrui Deng",
