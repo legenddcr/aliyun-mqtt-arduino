@@ -1,5 +1,11 @@
 # AliyunMqttArduino: Change Log
 
+## v0.2.0
+
+* Add two new APIs to support calculate HMAC256 externally for resource limited device like Arduino UNO.
+* Update README.
+* Add UNO example.
+
 ## v0.1.1
 
 * Include examples code in library release.

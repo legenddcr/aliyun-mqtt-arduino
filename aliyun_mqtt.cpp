@@ -32,69 +32,48 @@ static String hmac256(const String &signcontent, const String &ds)
   return sign;
 }
 
-bool connectAliyunMQTT(
-  PubSubClient &mqttClient,
-  const char *productKey,
-  const char *deviceName,
-  const char *deviceSecret,
-  const char *region)
+static String mqttBroker;
+static String mqttClientID;
+static String mqttUserName;
+static String mqttPassword;
+
+// call this function once
+void mqttPrepare(const char *timestamp,
+                 const char *productKey,
+                 const char *deviceName,
+                 const char *deviceSecret,
+                 const char *region)
 {
-  // Init MQTT broker
-  String mqttBroker = productKey;
+  mqttBroker = productKey;
   mqttBroker += ".iot-as-mqtt.";
   mqttBroker += String(region);
   mqttBroker += ".aliyuncs.com";
+  // Serial.println(mqttBroker);
 
-  // Generate MQTT Username, it can be device SN etc.
-  String mqttUserName = deviceName;
+  mqttUserName = deviceName;
   mqttUserName += '&';
   mqttUserName += productKey;
+  // Serial.println(mqttUserName);
 
-  // Generate MQTT client ID
-  String timestamp = String(millis());
-
-  String clientID = deviceName; // Device SN etc. can be used
-  String mqttClientID = clientID;
+  mqttClientID = deviceName; // device name used as client ID
   mqttClientID += "|securemode=3,signmethod=hmacsha256,timestamp=";
   mqttClientID += timestamp;
   mqttClientID += '|';
-
-  // Generate MQTT Password
-  String signcontent = "clientId";
-  signcontent += clientID;
-  signcontent += "deviceName";
-  signcontent += deviceName;
-  signcontent += "productKey";
-  signcontent += productKey;
-  signcontent += "timestamp";
-  signcontent += timestamp;
-
-  // Serial.print("HMAC256 data: ");
-  // Serial.println(signcontent);
-  // Serial.print("HMAC256 key: ");
-  // Serial.println(deviceSecret);
-  String mqttPassword = hmac256(signcontent, deviceSecret);
-
-  // Serial.println("=================");
-  // Serial.println(mqttBroker);
-  // Serial.println(MQTT_PORT);
-  // Serial.print("MQTT Client ID: ");
   // Serial.println(mqttClientID);
-  // Serial.print("MQTT User Name: ");
-  // Serial.println(mqttUserName);
-  // Serial.print("MQTT Password: ");
-  // Serial.println(mqttPassword);
+}
 
+bool connectAliyunMQTTWithPassword(PubSubClient &mqttClient, const char *password)
+{
   mqttClient.setServer(mqttBroker.c_str(), MQTT_PORT);
 
   byte mqttConnectTryCnt = 5;
   while (!mqttClient.connected() && mqttConnectTryCnt > 0)
   {
     Serial.println("Connecting to MQTT Server ...");
-    if (mqttClient.connect(mqttClientID.c_str(), mqttUserName.c_str(), mqttPassword.c_str()))
+    if (mqttClient.connect(mqttClientID.c_str(), mqttUserName.c_str(), password))
     {
 
-      Serial.println("MQTT Connected!");
+      // Serial.println("MQTT Connected!");
       return true;
     }
     else
@@ -102,15 +81,46 @@ bool connectAliyunMQTT(
       byte errCode = mqttClient.state();
       Serial.print("MQTT connect failed, error code:");
       Serial.println(errCode);
-      if (errCode == MQTT_CONNECT_BAD_PROTOCOL
-        || errCode == MQTT_CONNECT_BAD_CLIENT_ID
-        || errCode == MQTT_CONNECT_BAD_CREDENTIALS
-        || errCode == MQTT_CONNECT_UNAUTHORIZED)
+      if (errCode == MQTT_CONNECT_BAD_PROTOCOL || errCode == MQTT_CONNECT_BAD_CLIENT_ID || errCode == MQTT_CONNECT_BAD_CREDENTIALS || errCode == MQTT_CONNECT_UNAUTHORIZED)
+      {
+        Serial.println("No need to try again.");
         break; // No need to try again for these situation
+      }
       delay(5000);
     }
     mqttConnectTryCnt -= 1;
   }
 
   return false;
+}
+
+bool connectAliyunMQTT(
+    PubSubClient &mqttClient,
+    const char *productKey,
+    const char *deviceName,
+    const char *deviceSecret,
+    const char *region)
+{
+  String timestamp = String(millis());
+  mqttPrepare(timestamp.c_str(), productKey, deviceName, deviceSecret, region);
+
+  // Generate MQTT Password, use deviceName as clientID
+  String signcontent = "clientId";
+  signcontent += deviceName;
+  signcontent += "deviceName";
+  signcontent += deviceName;
+  signcontent += "productKey";
+  signcontent += productKey;
+  signcontent += "timestamp";
+  signcontent += timestamp;
+
+  String mqttPassword = hmac256(signcontent, deviceSecret);
+
+  // Serial.print("HMAC256 data: ");
+  // Serial.println(signcontent);
+  // Serial.print("HMAC256 key: ");
+  // Serial.println(deviceSecret);
+  // Serial.println(mqttPassword);
+
+  return connectAliyunMQTTWithPassword(mqttClient, mqttPassword.c_str());
 }
