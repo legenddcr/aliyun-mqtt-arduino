@@ -69,7 +69,7 @@ bool connectAliyunMQTTWithPassword(PubSubClient &mqttClient, const char *passwor
   byte mqttConnectTryCnt = 5;
   while (!mqttClient.connected() && mqttConnectTryCnt > 0)
   {
-    Serial.println("Connecting to MQTT Server ...");
+    // Serial.println("Connecting to MQTT Server ...");
     if (mqttClient.connect(mqttClientID.c_str(), mqttUserName.c_str(), password))
     {
 
@@ -79,11 +79,11 @@ bool connectAliyunMQTTWithPassword(PubSubClient &mqttClient, const char *passwor
     else
     {
       byte errCode = mqttClient.state();
-      Serial.print("MQTT connect failed, error code:");
-      Serial.println(errCode);
+      // Serial.print("MQTT connect failed, error code:");
+      // Serial.println(errCode);
       if (errCode == MQTT_CONNECT_BAD_PROTOCOL || errCode == MQTT_CONNECT_BAD_CLIENT_ID || errCode == MQTT_CONNECT_BAD_CREDENTIALS || errCode == MQTT_CONNECT_UNAUTHORIZED)
       {
-        Serial.println("No need to try again.");
+        // Serial.println("No need to try again.");
         break; // No need to try again for these situation
       }
       delay(5000);
